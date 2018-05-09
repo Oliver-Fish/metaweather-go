@@ -15,10 +15,10 @@ func TestGetLocation(t *testing.T) {
 		{"Invalid", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
 		{"Lat Long Query", "36.96,-122.02"},
 	}
-
+	meta := New()
 	for _, tt := range testQueries {
 		t.Run(tt.testName, func(t *testing.T) {
-			dat, err := GetLocation(tt.query)
+			dat, err := meta.GetLocation(tt.query)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -52,9 +52,10 @@ func TestGetWeather(t *testing.T) {
 		{"Invalid", "00000"},
 	}
 
+	meta := New()
 	for _, tt := range testQueries {
 		t.Run(tt.testName, func(t *testing.T) {
-			dat, err := GetWeather(tt.query)
+			dat, err := meta.GetWeather(tt.query)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -81,9 +82,10 @@ func TestGetWeatherDate(t *testing.T) {
 		{"Amsterdam", "727232"},
 	}
 	curTime := time.Now()
+	meta := New()
 	for _, tt := range testQueries {
 		t.Run(tt.testName, func(t *testing.T) {
-			dat, err := GetWeatherDate(tt.query, curTime)
+			dat, err := meta.GetWeatherDate(tt.query, curTime)
 			if err != nil {
 				t.Fatal(err)
 			}

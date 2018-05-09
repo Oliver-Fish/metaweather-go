@@ -2,19 +2,11 @@ package metaweather
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
-)
-
-const (
-	endpointURL              = "https://www.metaweather.com"                   //Base API url
-	locationQueryURL         = endpointURL + "/api/location/search/?query="    //Takes city name i.e London
-	locationQueryLattLongURL = endpointURL + "/api/location/search/?lattlong=" //Takes Lat and Long
-	weatherLocationURL       = endpointURL + "/api/location/"                  //Takes woeid that you get from Location queries
 )
 
 //LocationData stores the data returned from LocationQuery endpoint,
@@ -81,9 +73,47 @@ type Source struct {
 	CrawlRate int64  `json:"crawl_rate"`
 }
 
+const (
+	endpointURL              = "https://www.metaweather.com"                   //Base API url
+	locationQueryURL         = endpointURL + "/api/location/search/?query="    //Takes city name i.e London
+	locationQueryLattLongURL = endpointURL + "/api/location/search/?lattlong=" //Takes Lat and Long
+	weatherLocationURL       = endpointURL + "/api/location/"                  //Takes woeid that you get from Location queries
+)
+
+//Option defines an option for Client
+type Option func(*Client)
+
+//Client contains our settings metaweather settings
+type Client struct {
+	baseURL    string
+	httpClient *http.Client
+}
+
+//Builds a MetaWeather Client from the provided options
+func New(options ...Option) *Client {
+	c := &Client{
+		baseURL: endpointURL,
+		httpClient: &http.Client{
+			Timeout: time.Second * 30,
+		},
+	}
+
+	for _, option := range options {
+		option(c)
+	}
+	return c
+}
+
+//BaseURL allows for changing the API URL during testing
+func BaseURL(url string) Option {
+	return func(c *Client) {
+		c.baseURL = url
+	}
+}
+
 //GetLocation takes a location string either the name of a place or the long and Lat location of a place
 //This can return multiple locations
-func GetLocation(loc string) ([]LocationData, error) {
+func (c *Client) GetLocation(loc string) ([]LocationData, error) {
 	var lDat []LocationData
 	if strings.Contains(loc, ",") { //We Found a comma so this is a latlong
 		err := getJSONData(locationQueryLattLongURL+loc, &lDat)
@@ -100,17 +130,17 @@ func GetLocation(loc string) ([]LocationData, error) {
 }
 
 //GetWeather takes a woeid string can get this from a LocationData type, this will return all weather data including the source of said data
-func GetWeather(woeid string) (WeatherData, error) {
+func (c *Client) GetWeather(woeid string) (WeatherData, error) {
 	var wDat WeatherData
 	err := getJSONData(weatherLocationURL+woeid, &wDat)
 	if err != nil {
-		return nil, err
+		return wDat, err
 	}
 	return wDat, nil
 }
 
 //GetWeatherDate takes a woeid string can get this from a LocationData type, and a time.Time for the date this will return only weather data and no source data
-func GetWeatherDate(woeid string, date time.Time) ([]ConsolidatedWeather, error) { //Data string should be a go time/date object?
+func (c *Client) GetWeatherDate(woeid string, date time.Time) ([]ConsolidatedWeather, error) { //Data string should be a go time/date object?
 	var wDat []ConsolidatedWeather
 	y := date.Year()
 	m := int(date.Month())
