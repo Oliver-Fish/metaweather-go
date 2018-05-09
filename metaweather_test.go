@@ -21,6 +21,18 @@ func TestBaseURL(t *testing.T) {
 		t.Errorf("Expected value %q got %q", tString, meta.baseURL)
 	}
 }
+
+func TestGetJSONData(t *testing.T) {
+	tString := "localhost:9999"
+	meta := New(BaseURL(tString))
+	t.Run("API Down", func(t *testing.T) {
+		err := meta.getJSONData("/notfound", nil)
+		if err == nil {
+			t.Error("Expected error got nil ")
+		}
+	})
+}
+
 func TestGetLocation(t *testing.T) {
 	testQueries := []struct {
 		testName string
@@ -54,6 +66,14 @@ func TestGetLocation(t *testing.T) {
 
 		})
 	}
+	tString := "localhost:9999"
+	meta = New(BaseURL(tString))
+	t.Run("API Down", func(t *testing.T) {
+		_, err := meta.GetLocation("")
+		if err == nil {
+			t.Error("Expected error got nil ")
+		}
+	})
 }
 
 func TestGetLocationLattLong(t *testing.T) {
@@ -82,6 +102,14 @@ func TestGetLocationLattLong(t *testing.T) {
 
 		})
 	}
+	tString := "localhost:9999"
+	meta = New(BaseURL(tString))
+	t.Run("API Down", func(t *testing.T) {
+		_, err := meta.GetLocationLattLong("", "")
+		if err == nil {
+			t.Error("Expected error got nil ")
+		}
+	})
 }
 func TestGetWeather(t *testing.T) {
 	testQueries := []struct {
@@ -112,6 +140,14 @@ func TestGetWeather(t *testing.T) {
 			}
 		})
 	}
+	tString := "localhost:9999"
+	meta = New(BaseURL(tString))
+	t.Run("API Down", func(t *testing.T) {
+		_, err := meta.GetWeather("")
+		if err == nil {
+			t.Error("Expected error got nil ")
+		}
+	})
 }
 
 func TestGetWeatherDate(t *testing.T) {
@@ -141,4 +177,12 @@ func TestGetWeatherDate(t *testing.T) {
 			}
 		})
 	}
+	tString := "localhost:9999"
+	meta = New(BaseURL(tString))
+	t.Run("API Down", func(t *testing.T) {
+		_, err := meta.GetWeatherDate("", time.Now())
+		if err == nil {
+			t.Error("Expected error got nil")
+		}
+	})
 }
