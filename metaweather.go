@@ -88,12 +88,12 @@ func GetLocation(loc string) ([]LocationData, error) {
 	if strings.Contains(loc, ",") { //We Found a comma so this is a latlong
 		err := getJSONData(locationQueryLattLongURL+loc, &lDat)
 		if err != nil {
-			return lDat, err
+			return nil, err
 		}
 	} else { //No comma was found so this is a string of text instead (city,country etc)
 		err := getJSONData(locationQueryURL+loc, &lDat)
 		if err != nil {
-			return lDat, err
+			return nil, err
 		}
 	}
 	return lDat, nil
@@ -104,7 +104,7 @@ func GetWeather(woeid string) (WeatherData, error) {
 	var wDat WeatherData
 	err := getJSONData(weatherLocationURL+woeid, &wDat)
 	if err != nil {
-		return wDat, err
+		return nil, err
 	}
 	return wDat, nil
 }
@@ -118,7 +118,7 @@ func GetWeatherDate(woeid string, date time.Time) ([]ConsolidatedWeather, error)
 	dateString := strconv.Itoa(y) + "/" + strconv.Itoa(m) + "/" + strconv.Itoa(d)
 	err := getJSONData(weatherLocationURL+woeid+"/"+dateString, &wDat)
 	if err != nil {
-		return wDat, err
+		return nil, err
 	}
 	return wDat, nil
 }
