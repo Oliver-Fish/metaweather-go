@@ -5,13 +5,22 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 )
 
-//LocationData stores the data returned from LocationQuery endpoint,
+//LocationData stores the data returned from LocationQueryURL endpoint,
 //this provides us with the Woeid that lets us pull weather data
 type LocationData struct {
+	Title        string `json:"title"`
+	LocationType string `json:"location_type"`
+	Woeid        int64  `json:"woeid"`
+	LattLong     string `json:"latt_long"`
+}
+
+//LocationLattLongData stores the data returned from locationQueryLattLongURL endpoint,
+//this provides us with the Woeid that lets us pull weather data
+type LocationLattLongData struct {
+	Distance     int64  `json:"distance"`
 	Title        string `json:"title"`
 	LocationType string `json:"location_type"`
 	Woeid        int64  `json:"woeid"`
@@ -111,20 +120,23 @@ func BaseURL(url string) Option {
 	}
 }
 
-//GetLocation takes a location string either the name of a place or the long and Lat location of a place
-//This can return multiple locations
+//GetLocation takes a location string of a place name and returns a []LocationData
 func (c *Client) GetLocation(loc string) ([]LocationData, error) {
 	var lDat []LocationData
-	if strings.Contains(loc, ",") { //We Found a comma so this is a latlong
-		err := getJSONData(locationQueryLattLongURL+loc, &lDat)
-		if err != nil {
-			return nil, err
-		}
-	} else { //No comma was found so this is a string of text instead (city,country etc)
-		err := getJSONData(locationQueryURL+loc, &lDat)
-		if err != nil {
-			return nil, err
-		}
+	err := getJSONData(locationQueryURL+loc, &lDat)
+	if err != nil {
+		return nil, err
+	}
+	return lDat, nil
+}
+
+//GetLocationLattLong takes a Latt and Long String and returns a []LocationLattLongData
+func (c *Client) GetLocationLattLong(latt, long string) ([]LocationLattLongData, error) {
+	var lDat []LocationLattLongData
+	ll := latt + "," + long
+	err := getJSONData(locationQueryLattLongURL+ll, &lDat)
+	if err != nil {
+		return nil, err
 	}
 	return lDat, nil
 }

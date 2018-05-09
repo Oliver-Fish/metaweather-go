@@ -13,7 +13,6 @@ func TestGetLocation(t *testing.T) {
 		{"Single City", "Amsterdam"},
 		{"Multi-Return", "A"},
 		{"Invalid", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
-		{"Lat Long Query", "36.96,-122.02"},
 	}
 	meta := New()
 	for _, tt := range testQueries {
@@ -41,6 +40,33 @@ func TestGetLocation(t *testing.T) {
 	}
 }
 
+func TestGetLocationLattLong(t *testing.T) {
+	testQueries := []struct {
+		testName string
+		latt     string
+		long     string
+	}{
+		{"Bristol", "51.453732", "-2.591560"},
+	}
+	meta := New()
+	for _, tt := range testQueries {
+		t.Run(tt.testName, func(t *testing.T) {
+			dat, err := meta.GetLocationLattLong(tt.latt, tt.long)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(dat) == 0 {
+				t.Errorf("No values returned for %q - %q,%q", tt.testName, tt.latt, tt.long)
+			}
+			for _, v := range dat {
+				if v.Title == "" {
+					t.Error("No value for field title, JSON didn't unmarshal correctly")
+				}
+			}
+
+		})
+	}
+}
 func TestGetWeather(t *testing.T) {
 	testQueries := []struct {
 		testName string
