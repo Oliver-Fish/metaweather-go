@@ -1,8 +1,6 @@
 package metaweather
 
 import (
-	//"fmt"
-
 	"testing"
 	"time"
 )
