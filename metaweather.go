@@ -125,7 +125,6 @@ func GetWeatherDate(woeid string, date time.Time) ([]ConsolidatedWeather, error)
 
 //getJSONData is a helper function to prevent me doing the below error checking each time I need to json unmarshal on API endpoints
 func getJSONData(url string, out interface{}) error {
-	fmt.Println(url)
 	req, err := http.Get(url)
 	if err != nil {
 		return err
