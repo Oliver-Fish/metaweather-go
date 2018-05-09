@@ -123,7 +123,7 @@ func BaseURL(url string) Option {
 //GetLocation takes a location string of a place name and returns a []LocationData
 func (c *Client) GetLocation(loc string) ([]LocationData, error) {
 	var lDat []LocationData
-	err := getJSONData(locationQueryURL+loc, &lDat)
+	err := c.getJSONData(locationQueryURL+loc, &lDat)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func (c *Client) GetLocation(loc string) ([]LocationData, error) {
 func (c *Client) GetLocationLattLong(latt, long string) ([]LocationLattLongData, error) {
 	var lDat []LocationLattLongData
 	ll := latt + "," + long
-	err := getJSONData(locationQueryLattLongURL+ll, &lDat)
+	err := c.getJSONData(locationQueryLattLongURL+ll, &lDat)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (c *Client) GetLocationLattLong(latt, long string) ([]LocationLattLongData,
 //GetWeather takes a woeid string can get this from a LocationData type, this will return all weather data including the source of said data
 func (c *Client) GetWeather(woeid string) (WeatherData, error) {
 	var wDat WeatherData
-	err := getJSONData(weatherLocationURL+woeid, &wDat)
+	err := c.getJSONData(weatherLocationURL+woeid, &wDat)
 	if err != nil {
 		return wDat, err
 	}
@@ -158,7 +158,7 @@ func (c *Client) GetWeatherDate(woeid string, date time.Time) ([]ConsolidatedWea
 	m := int(date.Month())
 	d := date.Day()
 	dateString := strconv.Itoa(y) + "/" + strconv.Itoa(m) + "/" + strconv.Itoa(d)
-	err := getJSONData(weatherLocationURL+woeid+"/"+dateString, &wDat)
+	err := c.getJSONData(weatherLocationURL+woeid+"/"+dateString, &wDat)
 	if err != nil {
 		return nil, err
 	}
@@ -166,8 +166,8 @@ func (c *Client) GetWeatherDate(woeid string, date time.Time) ([]ConsolidatedWea
 }
 
 //getJSONData is a helper function to prevent me doing the below error checking each time I need to json unmarshal on API endpoints
-func getJSONData(url string, out interface{}) error {
-	req, err := http.Get(url)
+func (c *Client) getJSONData(url string, out interface{}) error {
+	req, err := c.httpClient.Get(url)
 	if err != nil {
 		return err
 	}
