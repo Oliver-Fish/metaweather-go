@@ -1,10 +1,26 @@
 package metaweather
 
 import (
+	"reflect"
 	"testing"
 	"time"
 )
 
+func TestAdd(t *testing.T) {
+	meta := New()
+	tmeta := reflect.TypeOf(meta).String()
+	if tmeta != "*metaweather.Client" {
+		t.Errorf("Expected type *metaweather.Client got %q", tmeta)
+	}
+}
+
+func TestBaseURL(t *testing.T) {
+	tString := "localhost:8080"
+	meta := New(BaseURL(tString))
+	if meta.baseURL != tString {
+		t.Errorf("Expected value %q got %q", tString, meta.baseURL)
+	}
+}
 func TestGetLocation(t *testing.T) {
 	testQueries := []struct {
 		testName string
